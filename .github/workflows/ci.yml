@@ -1,0 +1,141 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: "0 5 * * *"
+
+jobs:
+  fast-pr:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-gcc
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            configure: dev-debug
+            build: dev-debug
+            test: dev-debug
+          - name: linux-clang
+            os: ubuntu-latest
+            cc: clang
+            cxx: clang++
+            configure: dev-debug
+            build: dev-debug
+            test: dev-debug
+          - name: macos-clang
+            os: macos-latest
+            cc: clang
+            cxx: clang++
+            configure: dev-debug
+            build: dev-debug
+            test: dev-debug
+          - name: windows-msvc
+            os: windows-latest
+            configure: dev-debug
+            build: dev-debug
+            test: dev-debug
+            msvc: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lukka/get-cmake@latest
+
+      - name: Setup MSVC
+        if: matrix.msvc == true
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure (non-MSVC)
+        if: matrix.msvc != true
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: cmake --preset ${{ matrix.configure }}
+
+      - name: Configure (MSVC)
+        if: matrix.msvc == true
+        run: cmake --preset ${{ matrix.configure }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.build }}
+
+      - name: Test
+        run: ctest --preset ${{ matrix.test }} --output-on-failure
+
+  release-compat:
+    name: release-${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-gcc
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            configure: dev-release
+            build: dev-release
+            test: dev-release
+          - name: linux-clang
+            os: ubuntu-latest
+            cc: clang
+            cxx: clang++
+            configure: dev-release
+            build: dev-release
+            test: dev-release
+          - name: macos-clang
+            os: macos-latest
+            cc: clang
+            cxx: clang++
+            configure: dev-release
+            build: dev-release
+            test: dev-release
+          - name: windows-msvc
+            os: windows-latest
+            configure: dev-release
+            build: dev-release
+            test: dev-release
+            msvc: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lukka/get-cmake@latest
+
+      - name: Setup MSVC
+        if: matrix.msvc == true
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure (non-MSVC)
+        if: matrix.msvc != true
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: cmake --preset ${{ matrix.configure }}
+
+      - name: Configure (MSVC)
+        if: matrix.msvc == true
+        run: cmake --preset ${{ matrix.configure }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.build }}
+
+      - name: Test
+        run: ctest --preset ${{ matrix.test }} --output-on-failure
+
+  nightly-heavy:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lukka/get-cmake@latest
+      - name: Configure
+        run: cmake --preset dev-release
+      - name: Build
+        run: cmake --build --preset dev-release
+      - name: Test
+        run: ctest --preset dev-release --output-on-failure

@@ -1,0 +1,127 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_STANDARD": "23",
+        "SWARMNET_BUILD_TESTS": "ON",
+        "SWARMNET_BUILD_EXAMPLES": "ON"
+      }
+    },
+    {
+      "name": "dev-debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "dev-release",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "dev-debug-tidy",
+      "inherits": "dev-debug",
+      "cacheVariables": {
+        "SWARMNET_ENABLE_CLANG_TIDY": "ON"
+      }
+    },
+    {
+      "name": "san-asan",
+      "inherits": "dev-debug",
+      "cacheVariables": {
+        "SWARMNET_ENABLE_ASAN": "ON"
+      }
+    },
+    {
+      "name": "san-ubsan",
+      "inherits": "dev-debug",
+      "cacheVariables": {
+        "SWARMNET_ENABLE_UBSAN": "ON"
+      }
+    },
+    {
+      "name": "san-tsan",
+      "inherits": "dev-debug",
+      "cacheVariables": {
+        "SWARMNET_ENABLE_TSAN": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev-debug",
+      "configurePreset": "dev-debug"
+    },
+    {
+      "name": "dev-release",
+      "configurePreset": "dev-release"
+    },
+    {
+      "name": "dev-debug-tidy",
+      "configurePreset": "dev-debug-tidy"
+    },
+    {
+      "name": "san-asan",
+      "configurePreset": "san-asan"
+    },
+    {
+      "name": "san-ubsan",
+      "configurePreset": "san-ubsan"
+    },
+    {
+      "name": "san-tsan",
+      "configurePreset": "san-tsan"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "dev-debug",
+      "configurePreset": "dev-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "dev-release",
+      "configurePreset": "dev-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "san-asan",
+      "configurePreset": "san-asan",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "san-ubsan",
+      "configurePreset": "san-ubsan",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "san-tsan",
+      "configurePreset": "san-tsan",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

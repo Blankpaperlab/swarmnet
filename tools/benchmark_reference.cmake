@@ -1,0 +1,12 @@
+cmake_host_system_information(RESULT _host QUERY HOSTNAME)
+cmake_host_system_information(RESULT _os_name QUERY OS_NAME)
+cmake_host_system_information(RESULT _os_release QUERY OS_RELEASE)
+cmake_host_system_information(RESULT _cores QUERY NUMBER_OF_LOGICAL_CORES)
+cmake_host_system_information(RESULT _ram_mb QUERY TOTAL_PHYSICAL_MEMORY)
+
+message(STATUS "SwarmNet Benchmark Reference Machine")
+message(STATUS "Host: ${_host}")
+message(STATUS "OS: ${_os_name} ${_os_release}")
+message(STATUS "Logical Cores: ${_cores}")
+message(STATUS "Physical Memory MB: ${_ram_mb}")
+message(STATUS "Reference: ${_cores}-core ${_os_name} -- target <40% CPU / <3 GB for 1k agents")
